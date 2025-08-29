@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PayHub • Redirect</title>
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body class="dark">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="../index.html" aria-label="PayHub Home">
+          <span class="brand-mark">PayHub</span>
+        </a>
+        <nav class="nav" aria-label="Primary Navigation">
+          <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu">☰</button>
+          <ul id="nav-menu" class="nav-list">
+            <li><a href="../index.html#top">Home</a></li>
+            <li><a href="../index.html#features">Features</a></li>
+            <li><a href="../pricing.html">Pricing</a></li>
+            <li><a href="../policies.html">Legal</a></li>
+            <li><a href="../contact.html">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="header-cta">
+          <a class="btn btn-outline" href="../pricing.html">Get Started</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero compact">
+        <div class="container hero-inner">
+          <h1 class="hero-title">PayHub</h1>
+          <p class="hero-sub">A <span class="hmh">HackManHub</span> company</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="cta-card" style="min-height:220px; display:flex; align-items:center; justify-content:center; text-align:center;">
+            <div>
+              <h2 style="margin:0 0 8px;">Payment Page Placeholder</h2>
+              <p class="muted" style="max-width:640px; margin:0 auto 16px;">
+                This /redirect page is reserved for your payment flow. Add your checkout form, processing logic,
+                or external provider embed here when you’re ready.
+              </p>
+              <!-- Place your payment form, iframe, or scripts inside the container below. -->
+              <div id="payment-root" style="margin-top:8px; border:1px dashed var(--border); border-radius:12px; padding:18px;">
+                <!-- TODO: Inject payment UI here -->
+              </div>
+              <div style="margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <a class="btn btn-primary" href="../pricing.html">View Plans</a>
+                <a class="btn btn-outline" href="../index.html">Back to Home</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footnote">© <span id="year"></span> PayHub. All rights reserved.</div>
+    </footer>
+
+    <script src="../assets/script.js"></script>
+  </body>
+</html>
+
