@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HackManHub Key System — Unlock</title>
+<style>
+  :root{
+    --bg:#0b0b0b;
+    --panel:#0f1113;
+    --muted:#9aa0a6;
+    --accent:#ff7a18;
+    --glass: rgba(255,255,255,0.02);
+    --card:#141617;
+    --success:#2ecc71;
+    --radius:16px;
+    --pad:20px;
+    font-family:Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
+  html,body{
+    height:100%;
+    margin:0;
+    background:
+      radial-gradient(800px 400px at 10% 10%, rgba(255,122,24,0.06), transparent 6%),
+      linear-gradient(180deg,#070707 0%, #0d0d0d 100%);
+    color:#e6e9eb;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  .wrap{
+    max-width:1100px;
+    margin:40px auto;
+    padding:28px;
+  }
+
+  header.nav{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:28px;
+  }
+  .back{
+    width:40px;height:40px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);
+    display:inline-grid;place-items:center;color:var(--muted);cursor:pointer;
+  }
+  h1.title{
+    font-size:20px;margin:0;font-weight:600;
+  }
+
+  .panel{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding:28px;border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  .locked{
+    display:flex;align-items:center;gap:16px;margin-bottom:18px;
+  }
+  .locked svg{width:36px;height:36px;flex:0 0 36px;}
+  .locked h2{margin:0;font-size:18px;font-weight:600}
+  .locked p{margin:0;color:var(--muted);font-size:14px}
+
+  .tasks{
+    margin-top:12px;display:grid;grid-template-columns:1fr;gap:14px;
+  }
+
+  /* task card */
+  .task{
+    display:flex;align-items:center;gap:16px;padding:16px;border-radius:14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    border:1px solid rgba(255,255,255,0.02);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    cursor:pointer; user-select:none;
+  }
+  .task:active{transform:translateY(2px)}
+  .task:hover{box-shadow:0 10px 30px rgba(0,0,0,0.6); border-color: rgba(255,122,24,0.08);}
+
+  .task .media{
+    width:52px;height:52px;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    flex:0 0 52px;border:1px solid rgba(255,255,255,0.02);
+  }
+  .task .meta{flex:1;min-width:0}
+  .task .meta .name{font-weight:600;margin-bottom:4px}
+  .task .meta .desc{font-size:13px;color:var(--muted)}
+  .task .open{
+    width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:transparent;border:1px solid rgba(255,255,255,0.02);
+    color:var(--muted);
+  }
+
+  .task.completed{
+    border-color: rgba(46,204,113,0.14);
+    box-shadow: 0 10px 30px rgba(46,204,113,0.03);
+  }
+  .task .check{
+    width:36px;height:36px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(180deg,#05220a, #073311);
+    color:var(--success);border:1px solid rgba(46,204,113,0.12);
+  }
+
+  .destWrap{
+    display:flex;align-items:center;justify-content:center;margin-top:28px;
+  }
+  .btn{
+    padding:14px 30px;border-radius:40px;background:linear-gradient(90deg,var(--accent), #ff9a44);
+    color:#071014;font-weight:700;border:none;cursor:pointer;font-size:15px;box-shadow:0 12px 30px rgba(255,122,24,0.12);
+    transition:transform .12s ease,opacity .12s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.disabled{
+    background:linear-gradient(180deg,rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    color:var(--muted);box-shadow:none;border:1px solid rgba(255,255,255,0.02);cursor:not-allowed;
+  }
+
+  /* mini legend / info */
+  .infoRow{display:flex;gap:12px;align-items:center;margin-top:18px;color:var(--muted);font-size:13px}
+  .pill{background:var(--glass);padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.02);}
+
+  /* layout two-column for bigger screens */
+  @media(min-width:900px){
+    .mainGrid{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+    .tasks{grid-column:1/2}
+  }
+
+  /* right-side card (levels) styled like second screenshot */
+  .levels{
+    margin-top:0;padding:18px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.004));border:1px solid rgba(255,255,255,0.02);
+    height:100%;
+  }
+  .levelCard{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,0.25), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.02);margin-bottom:14px}
+  .levelCard .title{font-weight:700;margin-bottom:8px}
+  .levelCard .sub{color:var(--muted);font-size:13px;margin-bottom:12px}
+  .levelCard .icons{display:flex;gap:10px;flex-wrap:wrap}
+  .levelCard .continue{margin-top:12px;padding:10px 16px;border-radius:10px;background:rgba(255,122,24,0.12);color:var(--accent);font-weight:700;border:1px solid rgba(255,122,24,0.12);cursor:pointer}
+  .levelCard:last-child{margin-bottom:0}
+
+  /* small helper */
+  .muted{color:var(--muted)}
+  a.nounder{color:inherit;text-decoration:none}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="nav">
+      <div class="back" onclick="history.back()" title="Back" aria-hidden="true">
+        <!-- back arrow -->
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="title">HackManHub Key System</h1>
+    </header>
+
+    <section class="panel mainGrid" aria-label="Unlock steps and levels">
+      <div>
+        <div class="locked" role="region" aria-labelledby="lockedTitle">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="10" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.2" opacity="0.9"/>
+            <path d="M7 10v-2a5 5 0 0110 0v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="15" r="1.6" fill="currentColor"/>
+          </svg>
+          <div>
+            <h2 id="lockedTitle">Access Locked</h2>
+            <p>Complete the steps below to continue</p>
+          </div>
+        </div>
+
+        <div class="tasks" id="tasksList" role="list">
+          <!-- Task card template: edit data-url to the destination, data-key is unique id used in localStorage -->
+          <div class="task" role="listitem" tabindex="0" data-key="discord" data-url="https://discord.gg/your-server" aria-pressed="false">
+            <div class="media" aria-hidden="true">
+              <!-- discord svg -->
+              <svg width="26" height="26" viewBox="0 0 71 55" fill="none"><path d="M20.3 32.1c-2.2 0-4-2-4-4.5 0-2.5 1.8-4.5 4-4.5s4 2 4 4.5c0 2.5-1.8 4.5-4 4.5zm30.4 0c-2.2 0-4-2-4-4.5 0-2.5 1.8-4.5 4-4.5s4 2 4 4.5c0 2.5-1.8 4.5-4 4.5z" fill="#7289DA"/></svg>
+            </div>
+            <div class="meta">
+              <div class="name">Join on Discord</div>
+              <div class="desc">Complete to continue</div>
+            </div>
+            <div class="open" title="Open link" aria-hidden="true">
+              <!-- external arrow -->
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 14L21 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <div class="task" role="listitem" tabindex="0" data-key="youtube" data-url="https://youtube.com/yourchannel" aria-pressed="false">
+            <div class="media" aria-hidden="true">
+              <!-- youtube svg -->
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M22 7.5s-.2-1.7-.8-2.4c-.8-.9-1.7-.9-2.1-1C15.8 3.8 12 3.8 12 3.8s-3.8 0-6.9.3c-.4 0-1.4.1-2.1 1C2.2 5.8 2 7.4 2 7.4S2 9.3 2 11.2v1.6c0 1.9 0 3.8 0 3.8s.2 1.7.8 2.4c.8.9 1.9.9 2.4 1 1.7.3 7.6.3 7.6.3s3.8 0 6.9-.3c.4 0 1.4-.1 2.1-1 .6-.7.8-2.4.8-2.4s0-1.9 0-3.8v-1.6c0-1.9 0-3.8 0-3.8z" fill="#FF0000"/></svg>
+            </div>
+            <div class="meta">
+              <div class="name">Subscribe on YouTube</div>
+              <div class="desc">Complete to continue</div>
+            </div>
+            <div class="open" title="Open link" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 14L21 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <div class="task" role="listitem" tabindex="0" data-key="website" data-url="https://yourwebsite.example" aria-pressed="false">
+            <div class="media" aria-hidden="true">
+              <!-- globe svg -->
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2c2.5 3 2.5 7 2.5 10S14.5 19 12 22" stroke="#9aa0a6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="meta">
+              <div class="name">Visit Website</div>
+              <div class="desc">Complete to continue</div>
+            </div>
+            <div class="open" title="Open link" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 14L21 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="destWrap" style="flex-direction:column">
+          <div style="width:100%;max-width:520px;text-align:center">
+            <button id="goBtn" class="btn disabled" disabled aria-disabled="true">Go To Destination</button>
+            <div class="infoRow" style="justify-content:center">
+              <div class="pill">3 Checkpoints</div>
+              <div class="muted">Complete all steps</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    
+        </div>
+
+      </aside>
+    </section>
+  </div>
+
+<script>
+  (function(){
+    const tasks = Array.from(document.querySelectorAll('.task'));
+    const goBtn = document.getElementById('goBtn');
+    const STORAGE_KEY = 'hackmanhub.unlock.v1';
+
+    // load saved
+    const state = (function(){
+      try{
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      }catch(e){ return {}; }
+    })();
+
+    function save(){
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+    }
+
+    function markUI(taskEl, done){
+      if(done){
+        taskEl.classList.add('completed');
+        taskEl.setAttribute('aria-pressed','true');
+        // replace right-most open icon with check
+        let open = taskEl.querySelector('.open');
+        if(open){
+          open.innerHTML = '<div class="check" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+        }
+        // update desc
+        let desc = taskEl.querySelector('.desc');
+        if(desc) desc.textContent = 'Completed';
+      } else {
+        taskEl.classList.remove('completed');
+        taskEl.setAttribute('aria-pressed','false');
+        // restore open icon
+        let open = taskEl.querySelector('.open');
+        if(open){
+          open.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 14L21 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        }
+        let desc = taskEl.querySelector('.desc');
+        if(desc) desc.textContent = 'Complete to continue';
+      }
+    }
+
+    function updateGoButton(){
+      const allDone = tasks.every(t => state[t.dataset.key]);
+      if(allDone){
+        goBtn.classList.remove('disabled');
+        goBtn.disabled = false;
+        goBtn.setAttribute('aria-disabled','false');
+        goBtn.textContent = 'Go To Destination';
+      } else {
+        goBtn.classList.add('disabled');
+        goBtn.disabled = true;
+        goBtn.setAttribute('aria-disabled','true');
+        goBtn.textContent = 'Go To Destination';
+      }
+    }
+
+    // init UI from storage
+    tasks.forEach(t=>{
+      const key = t.dataset.key;
+      const done = !!state[key];
+      markUI(t, done);
+    });
+    updateGoButton();
+
+    // when clicking a task: open the link in a new tab and mark completed
+    tasks.forEach(t=>{
+      t.addEventListener('click', function(e){
+        const url = t.dataset.url || '#';
+        // open link
+        try{
+          window.open(url, '_blank', 'noopener');
+        }catch(err){
+          // fallback
+          const a = document.createElement('a');
+          a.href = url; a.target='_blank'; a.rel='noopener';
+          document.body.appendChild(a); a.click(); a.remove();
+        }
+        // mark as done
+        state[t.dataset.key] = true;
+        save();
+        markUI(t, true);
+        updateGoButton();
+      });
+
+      // keyboard support
+      t.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          t.click();
+        }
+      });
+    });
+
+    // allow unchecking via long-press (or alt+click) for testing/QA
+    let pressTimer;
+    tasks.forEach(t=>{
+      t.addEventListener('mousedown', function(e){
+        if(e.altKey) return; // alt-click handled separately
+        pressTimer = setTimeout(function(){
+          // long-press toggles (for test)
+          const key = t.dataset.key;
+          state[key] = !state[key];
+          save();
+          markUI(t, !!state[key]);
+          updateGoButton();
+        }, 700);
+      });
+      t.addEventListener('mouseup', function(){ clearTimeout(pressTimer); });
+      t.addEventListener('mouseleave', function(){ clearTimeout(pressTimer); });
+
+      // alt+click toggles locally for admin/testing
+      t.addEventListener('click', function(e){
+        if(e.altKey){
+          const key = t.dataset.key;
+          state[key] = !state[key];
+          save();
+          markUI(t, !!state[key]);
+          updateGoButton();
+          e.stopPropagation();
+        }
+      });
+    });
+
+    // Go button action:
+    goBtn.addEventListener('click', function(){
+      // final destination link (customize if needed)
+      const final = 'https://yourdestination.example/unlock';
+      // open only if all tasks done
+      const allDone = tasks.every(t => state[t.dataset.key]);
+      if(allDone){
+        window.open(final, '_self');
+      } else {
+        // small visual hint
+        goBtn.animate([{ transform:'translateY(0)'},{ transform:'translateY(-6px)'},{ transform:'translateY(0)'}], {duration:450});
+      }
+    });
+
+    // small helper: reset storage with Ctrl+Shift+R (dev only)
+    window.addEventListener('keydown', function(e){
+      if(e.key === 'R' && e.ctrlKey && e.shiftKey){
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    });
+
+    // Accessibility: focus first tab stop
+    document.addEventListener('DOMContentLoaded', function(){
+      const first = document.querySelector('.task');
+      if(first) first.setAttribute('tabindex','0');
+    });
+  })();
+</script>
+</body>
+</html>
